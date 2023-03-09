@@ -17,11 +17,13 @@ router.get("/contacts", async (req, res, next) => {
 
 //Update
 
-router.put("/contacts/edit", async (req, res, next) => {
+router.put("/contacts/edit/:id", async (req, res, next) => {
   const { phoneNumber, email, address, facebook, instagram } = req.body;
+  const { id } = req.params;
 
   try {
-    const updatedContacts = await Contacts.updateOne(
+    const updatedContacts = await Contacts.findByIdAndUpdate(
+      id,
       { phoneNumber, email, address, facebook, instagram },
       { new: true }
     );
