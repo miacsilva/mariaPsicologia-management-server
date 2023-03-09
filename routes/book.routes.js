@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const fileUploader = require("../config/cloudinary.config");
 const mongoose = require("mongoose");
 const axios = require("axios");
 
@@ -18,7 +17,7 @@ router.get("/books", async (req, res, next) => {
 
 //create book
 
-router.post("/books", fileUploader.single("image"), async (req, res, next) => {
+router.post("/books", async (req, res, next) => {
   const {
     title,
     description,
@@ -31,36 +30,16 @@ router.post("/books", fileUploader.single("image"), async (req, res, next) => {
   } = req.body;
 
   try {
-    let book;
-
-    if (req.file) {
-      book = await Book.create(
-        {
-          title,
-          description,
-          image: req.file.path,
-          publishedDate,
-          publisher,
-          author,
-          languages,
-          pages,
-        },
-        { new: true }
-      );
-    } else {
-      book = await Book.create(
-        {
-          title,
-          description,
-          publishedDate,
-          publisher,
-          author,
-          languages,
-          pages,
-        },
-        { new: true }
-      );
-    }
+    const book = await Book.create({
+      title,
+      description,
+      image,
+      publishedDate,
+      publisher,
+      author,
+      languages,
+      pages,
+    });
 
     res.json(book);
   } catch (error) {
@@ -84,67 +63,45 @@ router.get("/books/:id", async (req, res, next) => {
 
 //Update
 
-router.put(
-  "/books/edit/:id",
-  fileUploader.single("image"),
-  async (req, res, next) => {
-    const { id } = req.params;
-    const {
-      title,
-      description,
-      image,
-      publishedDate,
-      publisher,
-      author,
-      languages,
-      pages,
-    } = req.body;
+router.put("/books/edit/:id", async (req, res, next) => {
+  const { id } = req.params;
+  const {
+    title,
+    description,
+    image,
+    publishedDate,
+    publisher,
+    author,
+    languages,
+    pages,
+  } = req.body;
 
-    //check if id is a mongoDB valid ID
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      res.json("The provided id is not valid");
-    }
-
-    try {
-      let updatedBook;
-
-      if (req.file) {
-        updatedBook = await Book.findByIdAndUpdate(
-          id,
-          {
-            title,
-            description,
-            image: req.file.path,
-            publishedDate,
-            publisher,
-            author,
-            languages,
-            pages,
-          },
-          { new: true }
-        );
-      } else {
-        updatedBook = await Book.findByIdAndUpdate(
-          id,
-          {
-            title,
-            description,
-            publishedDate,
-            publisher,
-            author,
-            languages,
-            pages,
-          },
-          { new: true }
-        );
-      }
-
-      res.json(updatedBook);
-    } catch (error) {
-      res.json(error);
-    }
+  //check if id is a mongoDB valid ID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    res.json("The provided id is not valid");
   }
-);
+
+  try {
+    const updatedBook = await Book.findByIdAndUpdate(
+      id,
+      {
+        title,
+        description,
+        image,
+        publishedDate,
+        publisher,
+        author,
+        languages,
+        pages,
+      },
+      { new: true }
+    );
+
+    res.json(updatedBook);
+  } catch (error) {
+    res.json(error);
+  }
+});
 
 //Delete
 

@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const fileUploader = require("../config/cloudinary.config");
 const mongoose = require("mongoose");
 const axios = require("axios");
 
@@ -18,40 +17,16 @@ router.get("/therapies", async (req, res, next) => {
 
 //create therapy
 
-router.post(
-  "/therapies",
-  fileUploader.single("image"),
-  async (req, res, next) => {
-    const { title, description, image } = req.body;
+router.post("/therapies", async (req, res, next) => {
+  const { title, description, image } = req.body;
 
-    try {
-      let therapy;
-
-      if (req.file) {
-        therapy = await Therapy.create(
-          {
-            title,
-            description,
-            image: req.file.path,
-          },
-          { new: true }
-        );
-      } else {
-        therapy = await Therapy.create(
-          {
-            title,
-            description,
-          },
-          { new: true }
-        );
-      }
-
-      res.json(therapy);
-    } catch (error) {
-      res.json(error);
-    }
+  try {
+    const therapy = await Therapy.create({ title, description, image });
+    res.json(therapy);
+  } catch (error) {
+    res.json(error);
   }
-);
+});
 
 //Read (by id)
 
@@ -69,48 +44,27 @@ router.get("/therapies/:id", async (req, res, next) => {
 
 //Update
 
-router.put(
-  "/therapies/edit/:id",
-  fileUploader.single("image"),
-  async (req, res, next) => {
-    const { id } = req.params;
-    const { title, description, image } = req.body;
+router.put("/therapies/edit/:id", async (req, res, next) => {
+  const { id } = req.params;
+  const { title, description, image } = req.body;
 
-    //check if id is a mongoDB valid ID
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      res.json("The provided id is not valid");
-    }
-
-    try {
-      let updatedTherapy;
-
-      if (req.file) {
-        updatedTherapy = await Therapy.findByIdAndUpdate(
-          id,
-          {
-            title,
-            description,
-            image: req.file.path,
-          },
-          { new: true }
-        );
-      } else {
-        updatedTherapy = await Therapy.findByIdAndUpdate(
-          id,
-          {
-            title,
-            description,
-          },
-          { new: true }
-        );
-      }
-
-      res.json(updatedTherapy);
-    } catch (error) {
-      res.json(error);
-    }
+  //check if id is a mongoDB valid ID
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    res.json("The provided id is not valid");
   }
-);
+
+  try {
+    const updatedTherapy = await Therapy.findByIdAndUpdate(
+      id,
+      { title, description, image },
+      { new: true }
+    );
+
+    res.json(updatedTherapy);
+  } catch (error) {
+    res.json(error);
+  }
+});
 
 //Delete
 

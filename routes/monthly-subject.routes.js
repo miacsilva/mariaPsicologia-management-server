@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const fileUploader = require("../config/cloudinary.config");
 const mongoose = require("mongoose");
 const axios = require("axios");
 
@@ -18,78 +17,38 @@ router.get("/monthly-subject", async (req, res, next) => {
 
 //Update
 
-router.put(
-  "/monthly-subject/edit/:id",
-  fileUploader.single("image"),
-  async (req, res, next) => {
-    const { title, description, image } = req.body;
-    const { id } = req.params;
+router.put("/monthly-subject/edit/:id", async (req, res, next) => {
+  const { title, description, image } = req.body;
+  const { id } = req.params;
 
-    try {
-      let updatedMonthlySubject;
+  try {
+    const updatedMonthlySubject = await MonthlySubject.findByIdAndUpdate(
+      id,
+      { title, description, image },
+      { new: true }
+    );
 
-      if (req.file) {
-        updatedMonthlySubject = await MonthlySubject.findByIdAndUpdate(
-          id,
-          {
-            title,
-            description,
-            image: req.file.path,
-          },
-          { new: true }
-        );
-      } else {
-        updatedMonthlySubject = await MonthlySubject.findByIdAndUpdate(
-          id,
-          {
-            title,
-            description,
-          },
-          { new: true }
-        );
-      }
-
-      res.json(updatedMonthlySubject);
-    } catch (error) {
-      res.json(error);
-    }
+    res.json(updatedMonthlySubject);
+  } catch (error) {
+    res.json(error);
   }
-);
+});
 
 //create
-router.post(
-  "/monthly-subject",
-  fileUploader.single("image"),
-  async (req, res, next) => {
-    const { title, description, image } = req.body;
+router.post("/monthly-subject", async (req, res, next) => {
+  const { title, description, image } = req.body;
 
-    try {
-      let monthlySubject;
+  try {
+    const monthlySubject = await MonthlySubject.create({
+      title,
+      description,
+      image,
+    });
 
-      if (req.file) {
-        monthlySubject = await MonthlySubject.create(
-          {
-            title,
-            description,
-            image: req.file.path,
-          },
-          { new: true }
-        );
-      } else {
-        monthlySubject = await MonthlySubject.create(
-          {
-            title,
-            description,
-          },
-          { new: true }
-        );
-      }
-
-      res.json(monthlySubject);
-    } catch (error) {
-      res.json(error);
-    }
+    res.json(monthlySubject);
+  } catch (error) {
+    res.json(error);
   }
-);
+});
 
 module.exports = router;

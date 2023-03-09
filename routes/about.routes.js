@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const fileUploader = require("../config/cloudinary.config");
 const mongoose = require("mongoose");
 const axios = require("axios");
 
@@ -18,65 +17,40 @@ router.get("/about", async (req, res, next) => {
 
 //Update
 
-router.put(
-  "/about/edit/:id",
-  fileUploader.single("image"),
-  async (req, res, next) => {
-    const { name, education, image, bigAbout, smallAbout } = req.body;
-    const { id } = req.params;
+router.put("/about/edit/:id", async (req, res, next) => {
+  const { name, education, image, bigAbout, smallAbout } = req.body;
+  const { id } = req.params;
 
-    try {
-      let updatedAbout;
+  try {
+    const updatedAbout = await About.findByIdAndUpdate(
+      id,
+      { name, education, image, bigAbout, smallAbout },
+      { new: true }
+    );
 
-      if (req.file) {
-        updatedAbout = await About.findByIdAndUpdate(
-          id,
-          { name, education, image: req.file.path, bigAbout, smallAbout },
-          { new: true }
-        );
-      } else {
-        updatedAbout = await About.findByIdAndUpdate(
-          id,
-          {
-            name,
-            education,
-            bigAbout,
-            smallAbout,
-          },
-          { new: true }
-        );
-      }
-
-      res.json(updatedAbout);
-    } catch (error) {
-      res.json(error);
-    }
+    res.json(updatedAbout);
+  } catch (error) {
+    res.json(error);
   }
-);
+});
 
-/* //create
-router.post("/about", fileUploader.single("image"), async (req, res, next) => {
+//create
+router.post("/about", async (req, res, next) => {
   const { name, education, image, bigAbout, smallAbout } = req.body;
 
   try {
-    let about;
-
-    if (req.file) {
-      about = await About.create({
-        name,
-        education,
-        image: req.file.path,
-        bigAbout,
-        smallAbout,
-      });
-    } else {
-      about = await About.create({ name, education, bigAbout, smallAbout });
-    }
+    let about = await About.create({
+      name,
+      education,
+      image,
+      bigAbout,
+      smallAbout,
+    });
 
     res.json(about);
   } catch (error) {
     res.json(error);
   }
-}); */
+});
 
 module.exports = router;
