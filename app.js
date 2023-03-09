@@ -18,6 +18,21 @@ require("./config")(app);
 const indexRoutes = require("./routes/index.routes");
 app.use("/api", indexRoutes);
 
+const bookRoutes = require("./routes/book.routes");
+app.use("/api", bookRoutes);
+
+const aboutRoutes = require("./routes/about.routes");
+app.use("/api", aboutRoutes);
+
+const therapyRoutes = require("./routes/therapy.routes");
+app.use("/api", therapyRoutes);
+
+const contactsRoutes = require("./routes/contact.routes");
+app.use("/api", contactsRoutes);
+
+const monthlySubjectRoutes = require("./routes/monthly-subject.routes");
+app.use("/api", monthlySubjectRoutes);
+
 const authRoutes = require("./routes/auth.routes");
 app.use("/auth", authRoutes);
 
